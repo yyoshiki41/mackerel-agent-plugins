@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/lestrrat/go-test-mysqld"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -599,4 +601,28 @@ END OF INNODB MONITOR OUTPUT
 	// etc
 	assert.EqualValues(t, stat["unflushed_log"], 0)
 	assert.EqualValues(t, stat["uncheckpointed_bytes"], 0)
+}
+
+func TestTestMySQL(t *testing.T) {
+	conf := mysqltest.NewConfig()
+	conf.SkipNetworking = false
+	mysqld, err := mysqltest.NewMysqld(conf)
+	if err != nil {
+		t.Errorf("Failed to start mysqld: %s", err)
+	}
+	defer mysqld.Stop()
+
+	myp := MySQLPlugin{
+		Target: fmt.Sprintf("%s:%d", mysqld.Config.BindAddress, mysqld.Config.Port),
+		Username: "root",
+	}
+	stat, err := myp.FetchMetrics()
+	if err != nil {
+		t.Errorf("OutputValues: ", err)
+	}
+
+	if stat == nil {
+		t.Errorf("something went wrong")
+	}
+	assert.EqualValues(t, 0, stat["unflushed_log"])
 }
