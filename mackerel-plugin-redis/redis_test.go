@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/lestrrat/go-tcputil"
 	"github.com/soh335/go-test-redisserver"
 )
 
@@ -38,7 +40,11 @@ func TestFetchMetricsUnixSocket(t *testing.T) {
 
 func TestFetchMetrics(t *testing.T) {
 	// should detect empty port
-	portStr := "63331"
+	p, err := tcputil.EmptyPort()
+	if err != nil {
+		t.Errorf("faild to get empty port")
+	}
+	portStr := fmt.Sprint(p)
 	s, err := redistest.NewServer(true, map[string]string{
 		"port": portStr,
 	})
