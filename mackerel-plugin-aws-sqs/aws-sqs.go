@@ -73,7 +73,7 @@ func getLastPoint(cloudWatch *cloudwatch.CloudWatch, dimension *cloudwatch.Dimen
 	}
 
 	response, err := cloudWatch.GetMetricStatistics(&cloudwatch.GetMetricStatisticsInput{
-		StartTime:  aws.Time(now.Add(time.Duration(180) * time.Second * -1)), // 3 min (to fetch at least 1 data-point)
+		StartTime:  aws.Time(now.Add(time.Duration(300) * time.Second * -1)),
 		EndTime:    aws.Time(now),
 		Period:     aws.Int64(60),
 		Namespace:  aws.String("AWS/SQS"),
